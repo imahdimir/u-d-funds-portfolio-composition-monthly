@@ -1,7 +1,7 @@
 """
 
     """
-
+import pandas as pd
 import json
 from pathlib import Path
 
@@ -28,6 +28,9 @@ def main():
     ##
     df = pd.DataFrame()
     df['xlp'] = fps
+    fps[50]
+    df1 = pd.read_excel(fps[50], sheet_name=1, header=0)
+    df1
 
 
 
