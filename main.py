@@ -15,13 +15,33 @@ class GDUrl:
 
 gu = GDUrl()
 ##
+def clean_row_character(X):
+    df = X.fillna(0)
+    df = df.T
+    missing_numeric_features = []
+    for i in range(len(df.columns)):
+        if i <= 2:
+            pct_numeric = df[df.columns[i]].astype('string').str.isalpha().sum() / len(df)
+            if pct_numeric >= 0.8:
+                missing_numeric_features.append(i)
+            else:
+                continue
+        else:
+            continue
+
+    df = df.drop(df.columns[missing_numeric_features], axis=1)
+    X = df.T
+    return X
 def clean_column_numeric(X):
     df = X.fillna(0)
     missing_numeric_features = []
     for i in range(len(df.columns)):
-        pct_numeric = df[df.columns[i]].astype('string').str.isnumeric().sum() / len(df)
-        if pct_numeric >= 0.8:
-            missing_numeric_features.append(i)
+        if i <= 2:
+            pct_numeric = df[df.columns[i]].astype('string').str.isnumeric().sum() / len(df)
+            if pct_numeric >= 0.9:
+                missing_numeric_features.append(i)
+            else:
+                continue
         else:
             continue
 
@@ -50,8 +70,8 @@ def main():
     ##
     fps = list(gds.local_path.glob('*.xlsx'))
     ##
-    i=93
-    df_list=[]
+
+    df_list0=[]
     for i in tqdm(range(120)):
         df = pd.read_excel(fps[i], sheet_name=1, header=0)
         df = clean_row_nan(df)
@@ -59,17 +79,29 @@ def main():
         df = clean_column_numeric(df)
         df = df.iloc[:, [0,1,2,3,4,5,6]]
         df = df.T.reset_index(drop=True).T
-        df['Date'] = fps[i]
-        # df['Date'] = df['Date'].str.extract(r'(\d+)', expand=False)
-        print(len(df.columns))
-        df_list.append(df)
+        df['Date'] = fps[i].stem
+        df_list0.append(df)
 
 
-    df = pd.concat(df_list, axis=0, ignore_index=False)
+    df0 = pd.concat(df_list, axis=0, ignore_index=False)
+    df0 = df0.reset_index(drop=True)
+    ##
+    df_list1 = []
+    for i in tqdm(range(120,len(fps))):
+        df = pd.read_excel(fps[i], sheet_name=1, header=0)
+        df = clean_row_nan(df)
+        df = clean_column_nan(df)
+        df = clean_column_numeric(df)
+        df = df.iloc[:, [0, 2, 3, 4, 5, 6, 7]]
+        df = df.T.reset_index(drop=True).T
+        df['Date'] = fps[i].stem
+        df_list1.append(df)
 
-
-##
-
+    df1 = pd.concat(df_list1, axis=0, ignore_index=False)
+    df1 = df1.reset_index(drop=True)
+    ##
+    df = pd.concat([df0,df1], axis=0, ignore_index=False)
+    # df = clean_row_character(df)
     ##
     for a in tqdm(filenames):
         for h in reversed(H):
