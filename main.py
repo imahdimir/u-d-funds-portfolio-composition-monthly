@@ -162,7 +162,7 @@ def main() :
 
     df = pd.concat(dfList , axis = 0 , ignore_index = False)
 
-    df = df.fillna(0)  ##
+    df = df.fillna(0)
 
 ##
 if __name__ == "__main__" :
