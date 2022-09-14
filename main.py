@@ -1,14 +1,12 @@
 """
 
     """
-import pandas as pd
+##
 import json
-from pathlib import Path
-
 import pandas as pd
 from githubdata import GithubData
-from pandas.api.types import is_string_dtype
-from pandas.api.types import is_numeric_dtype
+from tqdm import tqdm
+##
 class GDUrl:
     with open('gdu.json' , 'r') as f:
         gj = json.load(f)
@@ -18,23 +16,28 @@ class GDUrl:
 gu = GDUrl()
 ##
 def clean_column_numeric(X):
-    df = df.fillna(0)
+    df = X.fillna(0)
     missing_numeric_features = []
     for i in range(len(df.columns)):
         pct_numeric = df[df.columns[i]].astype('string').str.isnumeric().sum() / len(df)
         if pct_numeric >= 0.8:
             missing_numeric_features.append(i)
-            print(missing_numeric_features)
         else:
             continue
 
-    df.drop(df.columns[missing_numeric_features], axis=1, inplace=True)
+    X = df.drop(df.columns[missing_numeric_features], axis=1)
     return X
  ##
 def clean_row_nan(X):
-    pct_null = df.T.isnull().sum() / len(df.T)
+    pct_null = X.T.isnull().sum() / len(X.T)
     missing_features = pct_null[pct_null > 0.3].index
-    df = df.drop(missing_features, axis=0)
+    X = X.drop(missing_features, axis=0)
+    return X
+
+def clean_column_nan(X):
+    pct_null = X.isnull().sum() / len(X)
+    missing_features = pct_null[pct_null > 0.7].index
+    X = X.drop(missing_features, axis=1)
     return X
  ##
 def main():
@@ -47,13 +50,22 @@ def main():
     ##
     fps = list(gds.local_path.glob('*.xlsx'))
     ##
+    i=93
+    df_list=[]
+    for i in tqdm(range(120)):
+        df = pd.read_excel(fps[i], sheet_name=1, header=0)
+        df = clean_row_nan(df)
+        df = clean_column_nan(df)
+        df = clean_column_numeric(df)
+        df = df.iloc[:, [0,1,2,3,4,5,6]]
+        df = df.T.reset_index(drop=True).T
+        df['Date'] = fps[i]
+        # df['Date'] = df['Date'].str.extract(r'(\d+)', expand=False)
+        print(len(df.columns))
+        df_list.append(df)
 
-    # for i in range(120):
-    df = pd.read_excel(fps[50], sheet_name=1, header=0)
-    df = clean_row_nan(df)
-    df = clean_column_numeric(df)
-    df = df.loc[:, [0,6]]
 
+    df = pd.concat(df_list, axis=0, ignore_index=False)
 
 
 ##
