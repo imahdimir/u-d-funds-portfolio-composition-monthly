@@ -21,7 +21,7 @@ gu = GDUrl()
 
 class Params :
     min_pct_ch = .7
-    min_pct_num = .7
+    min_pct_num = .9
     min_pct_nan_col = .3
     min_pct_nan_row = .7
 
@@ -108,15 +108,29 @@ def main() :
         df_list0.append(df)
 
     df0 = pd.concat(df_list0 , axis = 0 , ignore_index = False)
-    df0 = df0.fillna(0)
-    df0 = df0[df0.iloc[: , 0] != 0]
-    df0 = df0.reset_index(drop = True)
+    df1 = df0.copy()
+    ##
+    df1 = df1.fillna(0)
+    df1 = df1[df1.iloc[: , 0] != 0]
+    df1 = df1[~df1[0].str.contains('نام صندوق')]
+    df1 = df1.reset_index(drop = True)
+
+    df1 = df1.replace('_' , 0)
+    df1 = df1.replace('-' , 0)
+    ##
 
     ##
-    df0.columns = [str(x) for x in df0.columns]
-    df0.to_parquet('t.prq' , index = False)
+    df1.columns = [str(x) for x in df1.columns]
+    df1['0'] = df1['0'].astype('string')
+    df1.to_parquet('t.prq' , index = False)
 
     ##
+
+    ##
+    vl = 'نام صندوق'
+    msk = df0['0'].str.contains(vl)
+    msk = msk.fillna(False)
+    df1 = df0[msk]
 
 
 ##
