@@ -43,10 +43,10 @@ def clean_column_character(df) :
 
     for i , cn in enumerate(df1.columns) :
         if i != 0:
-            df1.iloc[:, i] = df1.iloc[:, i].astype('string')
-            pct_num = df1.iloc[:, i].str.isalpha().sum() / len(df1)
+            df1[cn] = df1[cn].astype('string')
+            pct_num = df1[cn].str.isalpha().sum() / len(df1)
             if pct_num >= p.min_pct_ch :
-                df = df.drop(index = i)
+                df = df.drop(columns = cn)
 
     return df
 
@@ -112,7 +112,7 @@ def main() :
         df = clean_row_character(df)
         df = clean_column_character(df)
         df = df.iloc[: , [0 , 1 , 2 , 3 , 4 , 5 , 6]]
-        df = df.T.reset_index(drop = True).T
+        df.columns = range(len(df.columns))
         df['Date'] = fps[i].stem
         df_list0.append(df)
 
