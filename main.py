@@ -13,6 +13,7 @@ class GDUrl :
         gj = json.load(f)
 
     src = gj['src']
+    src0 = gj['src0']
 
 gu = GDUrl()
 
@@ -30,7 +31,7 @@ def clean_row_character(df) :
 
     for ind , _ in df1.iterrows() :
         df1.loc[ind , :] = df1.loc[ind , :].astype('string')
-        pct_num = df1.loc[ind , :].str.isalpha().sum() / len(df.columns)
+        pct_num = df1.loc[ind , :].str.isalpha().sum() / len(df1.columns)
         if pct_num >= p.min_pct_ch :
             df = df.drop(index = ind)
 
