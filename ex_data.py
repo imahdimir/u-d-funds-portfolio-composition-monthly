@@ -69,16 +69,6 @@ def clean_column_numeric(df) :
     return df
 
 
-def clean_column_High_value(df) :
-    df1 = df.fillna(0)
-
-    for i , cn in enumerate(df1.columns) :
-        if df1.iloc[: , i].mean() >= 100 :
-            df = df.drop(columns = cn)
-
-    return df
-
-
 def clean_row_nan(df) :
     pct_null = df.T.isnull().sum() / len(df.T)
     missing_features = pct_null[pct_null > p.min_pct_nan_col].index
@@ -114,9 +104,6 @@ def main() :
         df = clean_column_character(df)
         df = df.iloc[: , [0 , 1 , 2 , 3 , 4 , 5 , 6]]
         df.columns = range(len(df.columns))
-        df = clean_column_High_value(df)
-        df = df.iloc[: , [0 , 1 , 2 , 3 , 4 , 5]]
-        df.columns: range = range(len(df.columns))
         df['Date'] = fps[i].stem
         df_list0.append(df)
 
