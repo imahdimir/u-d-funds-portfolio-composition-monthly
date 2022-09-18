@@ -35,7 +35,7 @@ def clean_row_character(df) :
 
     for ind , _ in df1.iterrows() :
         df1.loc[ind , :] = df1.loc[ind , :].astype('string')
-        pct_num = df1.loc[ind , :].str.isalpha().sum() / len(df1.columns)
+        pct_num = df1.loc[ind , :].str.fullmatch(r'\D+').sum() / len(df1.columns)
         if pct_num >= p.min_pct_ch :
             df = df.drop(index = ind)
 
@@ -44,7 +44,6 @@ def clean_row_character(df) :
 
 def clean_column_character(df) :
     df1 = df.fillna(0)
-    df1 = df1.reset_index(drop = True)
 
     for i , cn in enumerate(df1.columns) :
         if i != 0 :
@@ -72,8 +71,9 @@ def clean_column_numeric(df) :
 def clean_column_High_value(df) :
     df1 = df.fillna(0)
 
-    for i , cn in enumerate(df1.columns) :
-        if df1.iloc[: , i].mean() >= 100 :
+    for cn in df1.columns :
+        msk = df1[cn].str.fullmatch(r'\d*\.?\d+')
+        if df1.loc[msk, cn].max() >= 100 :
             df = df.drop(columns = cn)
 
     return df
