@@ -20,13 +20,13 @@ def main() :
 
     ##
     df1 = pd.read_parquet('t.prq')
-    df1.columns = ['Name' , 'Value' , 'Share' , 'Bond' , 'Deposit' , 'Cash' ,
+    df1.columns = ['Name' , 'Share' , 'Bond' , 'Deposit' , 'Cash' ,
                    'Other' , 'JMonths']
     ##
     Final = df.merge(df1 , on = ["Name"])
     Final = Final.sort_values(by = ["InstituteKind" , 'Name' , "JMonths"])
     Final = Final[
-        ['JMonths' , 'SEORegisterNo' , 'Value' , 'Share' , 'Bond' , 'Deposit' ,
+        ['JMonths' , 'SEORegisterNo', 'Share' , 'Bond' , 'Deposit' ,
          'Cash' , 'Other']]
     # Final.JMonths = Final.JMonths.str.replace('-' , '').astype(int)
     # Final = Final.astype(float)
