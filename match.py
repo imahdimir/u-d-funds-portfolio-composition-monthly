@@ -32,21 +32,30 @@ def main() :
          'Bond' , 'Deposit' , 'Cash' , 'Other']]
 
     Final.SEORegisterNo = Final.SEORegisterNo.astype('string')
-    Final[['Share' , 'Bond' , 'Deposit' , 'Cash' , 'Other']] = Final[
-        ['Share' , 'Bond' , 'Deposit' , 'Cash' , 'Other']].astype('float')
+    Final[['Value' , 'Share' , 'Bond' , 'Deposit' , 'Cash' , 'Other']] = Final[
+        ['Value' , 'Share' , 'Bond' , 'Deposit' , 'Cash' , 'Other']].astype(
+            'float')
     Final['Sum'] = Final['Share'] + Final['Bond'] + Final['Deposit'] + Final[
         'Cash'] + Final['Other']
     Final = Final[Final["Sum"] <= 110]
     Final = Final.reset_index(drop = True)
 
-    Final.columns
-    ##
-    Final.InstituteKind.unique()
+    Final
     ##
     Result = Final[Final["InstituteKind"] == "در اوراق بهادار با درآمد ثابت"]
-    Result = Result.groupby(["JMonths"]).mean()
-    Result = Result.reset_index()
+
+    Result['Share'] = Result['Share'] / 100
+    Result['ShareValue'] = Result['Share'] * Result['Value']
     Result = Result[Result['Share'] <= 100]
+    Result = Result.groupby(["JMonths"]).agg({
+            'SEORegisterNo' : 'size' ,
+            'Value'         : 'sum' ,
+            'ShareValue'    : 'sum'
+    })
+    Result['SharePercent'] = Result['ShareValue'] / Result['Value']
+    # Result.to_excel('Fund-Asset-Result-V2.xlsx')
+    ##
+
     ##
     import pandas_bokeh
 
