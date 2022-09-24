@@ -13,9 +13,9 @@ class GDUrl :
     with open('gdu.json' , 'r') as f :
         gj = json.load(f)
 
+    slf = gj['slf']
     src = gj['src']
     src0 = gj['src0']
-    slf = gj['slf']
     trg = gj['trg']
 
 gu = GDUrl()
