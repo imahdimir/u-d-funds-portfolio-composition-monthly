@@ -1,9 +1,11 @@
 """
 
 """
+
 import pandas as pd
-from ex_data import gu
 from githubdata import GithubData
+
+from ex_data import gu
 
 
 def main() :
@@ -17,18 +19,17 @@ def main() :
     df = gds0.read_data()
     ##
     df = df[['SEORegisterNo' , 'Name' , 'InstituteKind']]
-
     ##
     df1 = pd.read_parquet('t.prq')
     df1.columns = ['Name' , 'Value' , 'Share' , 'Bond' , 'Deposit' , 'Cash' ,
-                   'Other' , 'JMonths']
+                   'Other' , 'JMonth']
     ##
     Final = df.merge(df1 , on = ["Name"])
-    Final = Final.sort_values(by = ["JMonths"])
+    Final = Final.sort_values(by = ["JMonth"])
 
     # Final = Final.sort_values(by = ["InstituteKind" , 'Name' , "JMonths"])
     Final = Final[
-        ['JMonths' , 'SEORegisterNo' , 'InstituteKind' , 'Value' , 'Share' ,
+        ['JMonth' , 'SEORegisterNo' , 'InstituteKind' , 'Value' , 'Share' ,
          'Bond' , 'Deposit' , 'Cash' , 'Other']]
 
     Final.SEORegisterNo = Final.SEORegisterNo.astype('string')
@@ -40,37 +41,37 @@ def main() :
     Final = Final[Final["Sum"] <= 110]
     Final = Final.reset_index(drop = True)
 
-    Final
     ##
-    Result = Final[Final["InstituteKind"] == "در اوراق بهادار با درآمد ثابت"]
+    cols = {
+            'JMonth'        : None ,
+            'SEORegisterNo' : None ,
+            'Share'         : None ,
+            'Bond'          : None ,
+            'Deposit'       : None ,
+            'Cash'          : None ,
+            'Other'         : None ,
+            }
 
-    Result['Share'] = Result['Share'] / 100
-    Result['ShareValue'] = Result['Share'] * Result['Value']
-    Result = Result[Result['Share'] <= 100]
-    Result = Result.groupby(["JMonths"]).agg({
-            'SEORegisterNo' : 'size' ,
-            'Value'         : 'sum' ,
-            'ShareValue'    : 'sum'
-    })
-    Result['SharePercent'] = Result['ShareValue'] / Result['Value']
-    # Result.to_excel('Fund-Asset-Result-V2.xlsx')
+    do = Final[cols.keys()]
     ##
+    gdo = GithubData(gu.trg)
+    gdo.overwriting_clone()
+    ##
+    dfp = gdo.local_path / 'data.prq'
+    do.to_parquet(dfp , index = False)
+    ##
+    msg = 'Update data by: '
+    msg += gu.slf
 
     ##
-    import pandas_bokeh
-
-    Result.plot(kind = 'line' ,
-                x = 'JMonths' ,
-                y = ['Share' , 'Bond' , 'Deposit' , 'Cash' , 'Other'])
-    # Result.plot_bokeh.line(x = ['JMonths'] ,
-    #                        y = ['Share' , 'Bond' , 'Deposit' , 'Cash' ,
-    #                             'Other'] ,
-    #                        figsize = (900 , 500))
-
-    plt.show()
+    gdo.commit_and_push(msg)
 
     ##
 
+    gdo.rmdir()
+    gds0.rmdir()
+
+    ##
 
 if __name__ == "__main__" :
     main()
