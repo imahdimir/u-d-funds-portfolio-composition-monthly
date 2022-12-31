@@ -7,7 +7,6 @@ from githubdata import GithubData
 
 from ex_data import gu
 
-
 def main() :
     pass
 
@@ -71,8 +70,11 @@ def main() :
     gdo.rmdir()
     gds0.rmdir()
 
-    ##
+##
+
 
 if __name__ == "__main__" :
     main()
-    print('Done!')
+    print(Path(__file__) , 'Done!')
+
+##

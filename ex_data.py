@@ -3,11 +3,11 @@
     """
 
 import json
+from pathlib import Path
 
 import pandas as pd
-from githubdata import GithubData
+from githubdata import GitHubDataRepo as GHDR
 from tqdm import tqdm
-
 
 class GDUrl :
     with open('gdu.json' , 'r') as f :
@@ -88,12 +88,15 @@ def main() :
     pass
 
     ##
-    gds = GithubData(gu.src)
+    gds = GHDR(gu.src)
+
     ##
-    gds.overwriting_clone()
+    gds.clone_overwrite()
+
     ##
     fps = list(gds.local_path.glob('*.xlsx'))
     fps = sorted(fps)
+
     ##
     df_list0_0 = []
     for i in tqdm(range(1 , 119)) :
@@ -110,6 +113,8 @@ def main() :
 
     ##
     df0_0 = pd.concat(df_list0_0 , axis = 0 , ignore_index = False)
+
+    ##
     df_list0_1 = []
     for i in tqdm(range(119 , len(fps))) :
         df = pd.read_excel(fps[i] , sheet_name = 1 , header = 0)
@@ -123,10 +128,12 @@ def main() :
         df['Date'] = fps[i].stem
         df_list0_1.append(df)
 
+    ##
     df0_1 = pd.concat(df_list0_1 , axis = 0 , ignore_index = False)
 
     df0 = pd.concat([df0_0 , df0_1] , axis = 0 , ignore_index = False)
     df1 = df0.copy()
+
     ##
     df1 = df1.fillna(0)
     df1 = df1[df1.iloc[: , 0] != 0]
@@ -144,12 +151,15 @@ def main() :
     df1.to_parquet('t.prq' , index = False)
 
     ##
-
     gds.rmdir()
 
     ##
 
 ##
+
+
 if __name__ == "__main__" :
     main()
-    print('Done!')
+    print(Path(__file__) , 'Done!')
+
+##
